@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+
+# when security if paramount
+export PATH=/usr/sbin:/usr/bin:/bin
+
+declare name='Yongle'
+
+greet () {
+  echo "Hello, ${1:-there} $2"
+}
+
+clear
+greet
+
+echo "(The globals name is '$name')"
