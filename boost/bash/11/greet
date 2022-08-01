@@ -2,8 +2,40 @@
 
 
 greet(){
+  # option 1 - concise and quick to write
   local name=${1:-"there"}
+
+  # option 2 - more easily understood by people who don't know bash
+  #local name="there"
+  #if [[ -n "$1" ]]; then
+  # name=$1
+  #fi
   printf "Hello, %s. \n" "$name"
 }
 
-greet "${1^}"
+# greet "${1^}"
+
+what()
+{
+  local what="Mr Yongle"
+  printf "%s \n" "$what"
+  # Exclude everything up until the first space. Remove the "Mr" part
+  printf "${what#* } \n"
+  what="The Honorable Mr Yongle"
+  # Excludes everything up until the last space. Remove the "The Honorable Mr "
+  printf "${what##* } \n"
+  # Reverse is true if I use ${what% *}. This should print out "Yongle"
+  printf "${what% *} \n"
+  # Using ${what/Mr/Doctor} will replace the first instance of Mr
+  printf "${what/Mr/Doctor} \n"
+  # Using ${what//o/0} will replace all instances of o with 0
+  printf "${what//o/0} \n"
+}
+
+what
+
+
+
+
+
+

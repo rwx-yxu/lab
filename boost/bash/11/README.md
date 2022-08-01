@@ -6,5 +6,43 @@
 
 ## Recap:
 I used echo rather than printf. I should remember that I can pass
-through the parameter when calling the function using '$1' which can be
+through the parameter when calling the function using "\$1"  which can be
 used for parameter expansion as well.
+
+## Notes:
+* entr bash -c "clear;./greet Rob" <<< greet - This command will hot
+  reload the script if there are any changes to it."
+If bash syntax
+```
+if [[ condition ]]; then
+  execution
+fi
+```
+
+* What is the purpose of bash?
+  * Bash is for rapid applications development and for testing ideas.
+  * Write a script quickly that is most likely not going to stay around
+    for a long time.
+  * If it ever does become important, it should be migrated to a tool
+    like go. Googles own bash style guide recommends to move to a
+    different language if the bash script is 100 lines of code.
+
+* Expansion
+  * Substitues the expressions with something else.
+  * \${1..10} will substitute for 1 to 10
+  * \${variable}.md will substitute with the defined variable
+  * Be careful of not using double quotes for variables that have spaces
+    because bash will execute as separate commands space separated.
+  * Tilde expansion will evaluate to \$HOME path for user.
+  * \${#parameter} - parameter length used to see how many arguments you
+    have.
+  * \${parameter#* } used to exclude until the first instance of the
+    third argument after '\*'. \${parameter## \*} The double hash will
+    get the exclude the last instance. The inverse if true for % instead
+    of #. Examples included in greet. This can be used over sed or awk
+    because it is native bash.
+  * \${parameter/search/replace} This should replace a term for the
+    first instance.
+* Prefer using () over \` \` because you cannot nest with \` \`
+
+
