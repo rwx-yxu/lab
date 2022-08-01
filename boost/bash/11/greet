@@ -3,7 +3,7 @@
 
 greet(){
   local name=${1:-"there"}
-  echo "Hello, $name"
+  printf "Hello, %s. \n" "$name"
 }
 
-greet jeff
+greet "${1^}"
