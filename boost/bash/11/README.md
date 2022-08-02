@@ -44,5 +44,42 @@ fi
   * \${parameter/search/replace} This should replace a term for the
     first instance.
 * Prefer using () over \` \` because you cannot nest with \` \`
-
+* Arithmetic Expansion - To do math in bash, you have to either use
+    double parentheses or using bc. bc is not bash. This type of
+    expansion does not need to \$ notation at all inside to reference
+    variables or outside that are not expressions.
+```
+  n=$((n++))
+  # Output 0
+  n=$((n++))
+  # Output 0
+  # The $ is not required
+  ((n++))
+  # Output 1
+  # $ is required for expressions
+  local some=34
+  local other=20
+  echo "total: $((some + other))"
+  #Output: total: 54
+```
+* Bash does not do floating point math but bc can. \$((1/3)) will
+    evaluate to 0.
+* To evaluate this, you should use bc. This is the only safe way to do
+  floating point math on any unix system.
+```
+  #scale is the precision
+  $(bc <<< "scale=2;1/3")
+  #Ouput: .33
+```
+* bc can also be used to convert base numbers using 'obase' and 'ibase'.
+  For example, using a ibase=8 and obase=2, you can use it visualise rwx
+  for file permissions. Input of 644 will be 110100100 in binary.
+* In bash, there is an environment variable called RANDOM which selects
+  a random number between 0 and 32000.
+```
+# Select random number between 0 and 8.
+echo $((RANDOM % 8))
+# Select random number between 1 and 20.
+echo $((RANDOM%20 + 1))
+```
 
