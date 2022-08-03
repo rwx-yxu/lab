@@ -16,7 +16,7 @@ greet(){
   # test -z "$1" && test -z "$2" && echo "usage: greet first [second]" && return 1
 
   # long form
-  if [[ -z "$1$2" || $# > 2 ]]; then
+  if [[ -z "$1$2" || $# -gt 2 ]]; then
     echo "usage: greet first [second]"
     return 1
   fi
@@ -43,16 +43,16 @@ what()
   local what="Mr Yongle"
   printf "%s \n" "$what"
   # Exclude everything up until the first space. Remove the "Mr" part
-  printf "${what#* } \n"
+  printf '%s \n' "${what#* }"
   what="The Honorable Mr Yongle"
   # Excludes everything up until the last space. Remove the "The Honorable Mr "
-  printf "${what##* } \n"
+  printf '%s \n' "${what##* }"
   # Reverse is true if I use ${what% *}. This should print out "Yongle"
-  printf "${what% *} \n"
+  printf '%s \n' "${what% *}"
   # Using ${what/Mr/Doctor} will replace the first instance of Mr
-  printf "${what/Mr/Doctor} \n"
+  printf '%s \n' "${what/Mr/Doctor}"
   # Using ${what//o/0} will replace all instances of o with 0
-  printf "${what//o/0} \n"
+  printf '%s \n' "${what//o/0}"
 }
 
 #what
