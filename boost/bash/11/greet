@@ -11,13 +11,28 @@ greet(){
   # Could do if (($# == 2)). However, passing greet '' '' will be true
   # because we are passing through two empty characters which will be
   # counted.
-  if [[-n "$1" && -n "$2"]]
-    name=$1
+
+  # option 3 - short circuit logic
+  # test -z "$1" && test -z "$2" && echo "usage: greet first [second]" && return 1
+
+  # long form
+  if [[ -z "$1$2" || $# > 2 ]]; then
+    echo "usage: greet first [second]"
+    return 1
+  fi
+
+  if [[ -n "$1" && -n "$2" ]]; then
+    name="$1 $2"
   elif test -n "$1" ; then 
-   name="$1 $2"
+   name=$1
   else
     name=there
   fi
+
+  if [[ "${name,,}" =~ ^yongle ]]; then
+    name=${name^^}
+  fi
+
   printf "Hello, %s. \n" "$name"
 }
 

@@ -91,3 +91,19 @@ entr bash -c "clear; ./greet" < <(find . -name 'gr*')
 ```
 * "\$@" pass through all of the arguments separated by a space
 * "\$\*" concatenates  all of the arguments as one string
+* Short circuit logic - only works with true. Each condition that is
+  true is executed in order. The first condition that is false, stops
+  the evaluation of the condition and the return is false.
+* If the first condition is true, it will not read the next condition.
+* Starting a script with `set -e` will stop the script when any error
+  has been encountered. The default behaviour of shell is to carry on
+  execution even after an error has been encountered.
+  * Advised for `set -e` to be in script.
+* `set -x` is used for debug purposes. This is print out the line that
+  has been executed so it should only be used for development.
+* `=~` to match against a regular expression. This should be done within
+  double brackets. The regular expressions are extended type (basic,
+  extended and pearl being the others).
+
+
+
