@@ -101,6 +101,126 @@
 ```
 * The zero value for floating point types are 0.0.
   * This can have different variations such as: `0., .0, 0e0, 0x0p0`
+* A rune value is intended to store a Unicode code point. A Unicode code
+  point is a Unicode character but some Unicode characters are composed
+  of more than one code points each.
+* A rune literal is expressed as one or more characters enclosed in a
+  pair of quotes. The enclosed characters denote one Unicode point
+  value.
+* The most common rune literals is just to enclose the characters
+  denoted by rune values between two single quotes.
+* Rune integer literals start with a \.
+  * Octal representation must be followed by three octal digits to
+    represent a byte value where the first bit is the sign.
+  * `\x` must be followed by exactly two hex digits.
+  * `\U` must be followed by exactly eight hex digits.
+  * `\u` must be followed by exactly four hex digits.
+  * Each octal or hex sequence must represent a legal Unicode point or
+    else, Go will fail to compile.
+
+```
+//Rune literals enclosed by single quotes
+'a' // an English character
+'π'
+'众' // a Chinese character
+
+//The unicode character of 'a' is 97.
+// 141 is the octal representation of decimal number 97.
+'\141'
+// 61 is the hex representation of decimal number 97.
+'\x61'
+'\u0061'
+'\U00000061'
+
+fmt.Println('a')
+\\Output 97
+fmt.Println('ab')
+\\more than one character in rune literal
+```
+
+* In practice, the four rune literal forms are rarely used for rune
+  values. They are mainly used for interpreted string literals.
+* If a run literal is composed by two characters (excluding the two
+  quotes), the first character is \ and the second is not a digital
+  digital character x, u and U, then the successive characters will be
+  escaped as one special character.
+
+```
+//The possible character pairs to be escaped
+
+\a (Unicode value 0x07) alert or bell
+\b (Unicode value 0x08) backspace
+\f (Unicode value 0x0C) form feed - advance downward to the next "page".
+This is mainly used as section separators
+\n (Unicode value 0x0A) line feed or newline
+\r (Unicode value 0x0D) carriage return - Return to the beginning of the
+current line without advancing downward.
+\t (Unicode value 0x09) horizontal tab
+\v (Unicode value 0x0b) vertical tab
+\\ (Unicode value 0x5c) backslash
+\' (Unicode value 0x27) single quote
+```
+
+* String value literals in Go are UTF-8 encoded.
+* All Go source files must be UTF-8 encoding compatible.
+* There are two forms of string value literals.
+  * Interpreted - double quotes form.
+  * Raw - back tick form.
+
+```
+// The interpreted form.
+"Hello\nworld!\n\"你好世界\""
+
+// The raw form.
+`Hello
+world!
+"你好世界"`
+```
+
+* \" is only legal in interpreted string literals and \` is only legal
+  in rune literals.
+* Unicode string literals can also be used in interpreted string
+  literals.
+
+```
+// The following interpreted string literals are equivalent.
+"\141\142\143"
+"\x61\x62\x63"
+"\x61b\x63"
+"abc"
+
+// The following interpreted string literals are equivalent.
+"\u4f17 = \xe4\xba\xba"
+ // The Unicode of 众 is 4f17, which is
+ // UTF-8 encoded as three bytes: e4 bc 97.
+"\xe4\xbc\x97 = \u4eba"
+ // The Unicode of 人 is 4eba, which is
+  // UTF-8 encoded as three bytes: e4 ba ba.
+"\xe4\xbc\x97\xe4\xba\xba"
+"众人"
+```
+
+* English characters will be represented as one byte where as Chinese
+  characters will be represented as three bytes.
+* In a raw string literal, no character sequences will be escaped. The
+  back quote character is not allowed to appear in a raw string literal.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
