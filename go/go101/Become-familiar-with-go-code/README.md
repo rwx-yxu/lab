@@ -205,27 +205,132 @@ world!
 * In a raw string literal, no character sequences will be escaped. The
   back quote character is not allowed to appear in a raw string literal.
 
+## Untyped values and typed values
+* An untyped value manes the type of the value has not been confirmed
+  yet. Whereas a typed value is determined.
+* For untyped values, each of them has one default type.
+  * The predeclared `nil` is the only untyped value which has no default
+    type.
+* All literal constants are untyped values.
+  * Most untyped values are literal constants and named constants.
 
+## Explicit conversions of untyped constants.
+* We can use the form T(v) to convert a value to the type denoted by T.
+* for an untyped constant value v, there are two scenarios where T(v) is
+  legal.
+  1. v(or the literal denoted by v) is representable as a value of basic
+     type T. The result is a typed constant of type T.
+  1. The default type of v is an integer type (int or rune) and T is a
+     string type. The result of T(v) is a string of type T and contains
+     the UTF-8 representation of the integer as Unicode code point. The
+     result string of a conversion from an integer always contains one
+     and only one rune.
 
+```
+// Rounding happens in the following 3 lines.
+complex128(1 + -1e-1000i) // 1.0+0.0i
+float32(0.49999999) // 0.5
+float32(17000000000000000)
+// No rounding in the these lines.
+float32(123)
+uint(1.0)
+int8(-123)
+int16(6+0i)
+complex128(789)
+string(65) // "A"
+string('A') // "A"
+string('\u68ee') // "森"
+string(-1) // "\uFFFD"
+string(0xFFFD) // "\uFFFD"
+string(0x2FFFFFFFF) // "\uFFFD"
 
+// 1.23 is not representable as a value of int.
+int(1.23)
+// -1 is not representable as a value of uint8. uint should only be
+positive integers
+uint8(-1)
+// 1+2i is not representable as a value of float64.
+float64(1+2i)
+// Constant -1e+1000 overflows float64.
+float64(-1e1000)
+// Constant 0x10000000000000000 overflows int.
+int(0x10000000000000000)
+// The default type of 65.0 is float64,
+// which is not an integer type.
+string(65.0)
+// The default type of 66+0i is complex128,
+// which is not an integer type.
+string(66+0i)
+```
 
+* Sometimes, the form of explicit conversions must be written as (T)(v)
+  to avoid ambiguities. This often happens if I is not an identifier.
 
+## Introductions to type deductions
+* Programmers do not need to explicitly specify the types of some values
+  in Go.
+* Go compilers will deduce the types for these values by context. This
+  is also known as type inference.
 
+## Constant declarations
+* The keyword `const` is used to declare named constants.
 
+```
+package main
 
+// Declare two individual constants. Yes,
+// non-ASCII letters can be used in identifiers.
+const π = 3.1416
+const Pi = π // <=> const Pi = 3.1416
 
+Declare multiple constants in a group.
+const (
+	No = !Yes
+	Yes = true
+	MaxDegrees = 360
+	Unit = "radian"
+)
 
+func main() {
+	// Declare multiple constants in one line.
+	const TwoPi, HalfPi, Unit2 = π * 2, π * 0.5, "degree"
+}
+```
 
+* The = symbol means "bind" instead of "assign".
+* Constants can be declared both at the package level and in function
+  bodies.
+* The constants are untyped and the type are the same as the literals
+  bound to it.
 
+## Typed named constants
+* Typed constants are all named.
 
+```
+const X float32 = 3.14
 
+const (
+ A, B int64 = -3, 5
+ Y float32 = 2.718
+)
+```
+* If multiple typed constants are declared, then their types must be the
+  same.
+* We can also use explicit conversion to provide enough information for
+  Go compilers to deduce the types.
+* If a basic value literal is bound to a typed constant, the basic value
+  literal must be representable as a value of the type.
 
-
-
-
-
-
-
-
-
+```
+// error: 256 overflows uint8
+const a uint8 = 256
+// error: 256 overflows uint8
+const b = uint8(255) + uint8(1)
+// error: 128 overflows int8
+const c = int8(-128) / int8(-1)
+// error: -1 overflows uint
+const MaxUint_a = uint(^0)
+// error: -1 overflows uint
+const MaxUint_b uint = ^0
+```
 
