@@ -314,6 +314,7 @@ const (
  Y float32 = 2.718
 )
 ```
+
 * If multiple typed constants are declared, then their types must be the
   same.
 * We can also use explicit conversion to provide enough information for
@@ -330,7 +331,44 @@ const b = uint8(255) + uint8(1)
 const c = int8(-128) / int8(-1)
 // error: -1 overflows uint
 const MaxUint_a = uint(^0)
-// error: -1 overflows uint
+// error: -1 overflows uint. ^ is a bitwise-not operator
 const MaxUint_b uint = ^0
 ```
+
+* The following examples are valid on 64-bit OSes but invalid for 32-bit
+  OSes because `unit` has only 64 buts on 64-bit OSes and same for
+  32-bit OSes.
+
+```
+// bit-wise left operator doubles the value by 2^n in the form y=y *
+2^n. For binary, this means to shift by one bit to the right. Since we
+have a starting bit, we can shift by 64 which will form 1 and 64 zeros.
+This will cause an overflow so we need to subtract 1 to get the max
+value for unint. This would only be valid for 64-bit Oses
+const Max unit = (1 << 64) -1
+
+// We can also declare a uint and bind the largest value to it. The not
+operator will flip the all bits to the opersite value. If we have a
+value of 0 for uint, we can use bit-wise not to change all the bits to 1
+by using the not operator. This operator can be used on the type or
+variable only.
+const MaxUint = ^uint(0)
+
+// This means we can also declare a typed int constant and bind the largest
+vlaue to it using the bitwise right operator. We can get the max size of
+uint and shift by one bit to the right for int because the first bit
+is the sign.
+const MaxInt = int(^uint(0)>>1)
+
+//By using the bitwise operators, we can get the number of bits of a
+native word and check the current OS.
+
+// NativeWordBits is 64 or 32.
+const NativeWordBits = 32 << (^uint(0) >> 63)
+const Is64bitOS = ^uint(0) >> 63 != 0
+const Is32bitOS = ^uint(0) >> 32 == 0
+
+```
+
+
 
