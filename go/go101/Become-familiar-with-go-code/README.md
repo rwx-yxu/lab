@@ -370,5 +370,316 @@ const Is32bitOS = ^uint(0) >> 32 == 0
 
 ```
 
+## Autocomplete in constant declarations
+* Group constant declarations except the first constant can be
+  incomplete. An incomplete constant does not contain the = symbol. The
+  remaining constants will inherit the first constant that is defined
+  above.
+
+```
+const (
+	A float32 = 5342
+	B float32 = 218
+	C
+)
+as
+const (
+	A float32 = 5342
+	B float32 = 218
+	C float32 = 218
+)
+```
+
+## iota in constant declarations
+* `iota` is a predeclared constant which can only be used in other
+  constant declarations. It is declared as `const iota = 0`. This
+  constant will increment by 1 for each constant declaration.
+* `iota` is mostly useful in a `const` group whereby multiple constants
+  are declared.
+* `iota` can only be used in constant declarations
+```
+Package main
+
+func main() {
+ const (
+ k = 3 // now, iota == 0
+
+ m float32 = iota + .5 // m float32 = 1 + .5
+ n // n float32 = 2 + .5
+
+ p = 9 // now, iota == 3
+ q = iota * 2 // q = 4 * 2
+ _ // _ = 5 * 2
+ r // r = 6 * 2
+ s, t = iota, iota // s, t = 7, 7
+ u, v // u, v = 8, 8
+ _, w // _, w = 9, 9
+ )
+
+ const x = iota // x = 0
+ const (
+ y = iota // y = 0
+ z // z = 1
+ )
+
+ println(m) // +1.500000e+000
+ println(n) // +2.500000e+000
+ println(q, r) // 8 12
+ println(s, t, u, v, w) // 7 7 8 8 9
+ println(x, y, z) // 0 0 1
+}
+
+const (
+ Failed = iota - 1 // == -1
+ Unknown // == 0
+ Succeeded // == 1
+)
+
+const (
+ Readable = 1 << iota // == 1
+ Writable // == 2
+ Executable // == 4
+)
+```
+
+## Standard variable declaration forms
+* Each standard declaration starts with the `var` keyword which is
+  followed by the declared variable name. Variable names must be valid
+  identifiers.
+
+```
+//When declaring multiple full standard variables at once, the type must be the same
+for all the variables.
+var lang, website string = "Go", "https://golang.org"
+var compiled, dynamic bool = true, false
+var announceYear int = 2009
+
+// The types of the lang and dynamic variables
+// will be deduced as built-in types "string"
+// and "bool" by compilers, respectively.
+var lang, dynamic = "Go", false
+
+// The types of the compiled and announceYear
+// variables will be deduced as built-in
+// types "bool" and "int", respectively.
+var compiled, announceYear = true, 2009
+
+// The types of the website variable will be
+// deduced as the built-in type "string".
+var website = "https://golang.org"
+
+// Both are initialized as blank strings.
+var lang, website string
+// Both are initialized as false.
+var interpreted, dynamic bool
+// n is initialized as 0.
+var n int
+
+var (
+	lang, bornYear, compiled = "Go", 2007, true
+	announceAt, releaseAt int = 2009, 2012
+)
+```
+
+## Pure value assignments
+* The expression items on the left of the = symbol are called
+  destination or target values. The right side of the = symbol are
+  called the source values.
+* Constants are immutable (unchangeable) so constant cannot show up on
+  the left side of a pure assignment as a destination value.
+  * Constants can be used as the right side source value.
+* Blank identifiers can also appear at the left side of pure value
+  assignments. However, they cannot be used as source values for
+  assignments.
+
+```
+const N = 123
+var x int
+var y, z float32
+
+N = 9 // error: constant N is not modifiable
+y = N // ok: N is deduced as a float32 value
+x = y // error: type mismatch
+x = N // ok: N is deduced as an int value
+y = x // error: type mismatch
+z = y // ok
+_ = y // ok
+
+x, y = y, x // error: type mismatch
+x, y = int(y), float32(x) // ok
+z, y = y, z // ok
+ _, y = y, z // ok
+//Go does not support assignment chains.
+var a, b int
+a = b = 123 // syntax error
+```
+
+## Short variable declarations forms
+* We can also declare variables in a short form without the `var`
+  keyword.
+* These declarations can only be used for local variables. Not package
+  level variables.
+
+```
+package main
+
+ func main() {
+  // Both lang and year are newly declared.
+  lang, year := "Go language", 2007
+
+  // Only createdBy is a new declared variable.
+  // The year variable has already been
+  // declared before, so here its value is just
+  // modified, or we can say it is redeclared.
+  year, createdBy := 2009, "Google Research"
+
+  // This is a pure assignment.
+  lang, year = "Go", 2012
+
+  print(lang, " is created by ", createdBy)
+  println(", and released at year", year)
+ }
+```
+
+* In short variable declaration, there must be at least one new variable
+  on the left of `:=`
+* In a short variable declaration, all items t the left of the `:=` sign
+  must be pure identifiers. This means that some other items cannot be
+  the destination value.
+  * Such as: container elements, pointer dereferences and struct field selectors. Pure assignments have no such limit.
+
+## Each local declared variable must be used at lease once
+* The go compiler do not allow local variables declared but not used.
+  Package level variables have no such limit.
+* If a local variable is only ever used as destination values, it will
+  be viewed as unused.
+
+## Dependency relations of package level variable initialization order
+```
+var x, y = a+1, 5 // 8 5
+var a, b, c = b+1, c+1, y // 7 6 5
+//Order of initalization are  y = 5, c = y, b = c+1, a = b+1, and
+x = a+1.
+
+//Package level variables cannot be used circularly.
+var x, y = y, x // fail to compile
+```
+
+## Explicit conversions on non-Constant numeric values
+* In Go, two typed values of two different basic types can't be assigned
+  to each other. The types of the destination and source values in an
+  assignment must be identical.
+* If the type of the source and destination are not the same, then the
+  source value must be explicitly converted to the type of the
+  destination value.
+* Non-constant integer values can be converted to strings.
+  * Non-constant floating point and integer values can be explicitly
+    converted to any other floating-point and integer types.
+* Overflows are allowed in non-constant number conversions.
+* When converting non-constant floating point values to an integer,
+  rounding is allowed.
+
+```
+const a = -1.23
+// The type of b is deduced as float64.
+var b = a
+// error: constant 1.23 truncated to integer.
+var x = int32(a)
+// error: cannot assign float64 to int32.
+var y int32 = b
+// okay: z == -1, and the type of z is int32.
+// The fraction part of b is discarded.
+var z = int32(b)
+const k int16 = 255
+// The type of n is deduced as int16.
+var n = k
+// error: constant 256 overflows uint8.
+var f = uint8(k + 1)
+// error: cannot assign int16 to uint8.
+var g uint8 = n + 1
+// okay: h == 0, and the type of h is uint8.
+// n+1 overflows uint8 and is truncated.
+var h = uint8(n + 1)
+```
+
+* Named constant declarations will be replaced with the literal it
+  represents at compile time.
+* If two operands of an operator operations are both constants, then the
+  operation will be evaluated at compile time.
+
+```
+package main
+const X = 3
+const Y = X + X
+var a = X
+
+func main() {
+  b := Y
+  println(a, b, X, Y)
+}
+
+// will be viewed as at compile time. The constants have been evaluated.
+package main
+
+var a = X
+
+func main() {
+  b := 6
+  println(a, b, 3, 6)
+}
+```
+
+## Common Operators
+* Like in C and C++, the multiplication binary operator can also be used
+  as pointer dereference operator and the bitwise and operator `&` can
+  also be used as pointer address.
+* There is no power operator in Go. The `Pow` function in the math
+  standard package will need to be used instead.
+* The bit-wise clear operator `&^` is unique in Go. `m &6` is equivalent
+  to `m &(n)`
+* The rules for the result of a bitwise shift operator operation is
+  always an integer value.
+* Avoid cases that some bitwise shift operations return different result
+  on different architectures on 64 bit and 32 bit OSes.
+
+```
+package main
+
+const n = uint(8)
+var m = uint(8)
+func main() {
+ println(a, b) // 2 0
+}
+
+var a byte = 1 << n / 128
+var b byte = 1 << m / 128
+
+//Above prints 2 and 0 because the two lines are equivalent to
+var a = byte(int(1) << n / 128)
+var b = byte(1) << m / 128
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
