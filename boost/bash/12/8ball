@@ -1,0 +1,99 @@
+#!/bin/bash
+set -e
+# 8ball answers any question with a random answer like the magic eight
+# ball toy. If any argument is passed it assumes the combined arguements
+# are the question, otherwise, it waits and prompts the user to type in
+# a question and will continue to wait and prompt for subsequent
+# questions providing essential life advice.
+
+#The declare is not always necessary
+
+# declare -a answers=(
+#   'It is certain'
+#   'Reply hazy, try again'
+#   'Dont count on it'
+#   'It is decidedly so'
+#   'Ask again later'
+#   'My reply is no'
+#   'Without a doubt'
+#   'Better not tell you now'
+#   'My sources say no'
+#   'Yes definately'
+#   'Cannot predict now'
+#   'You may rely on it'
+#   'Concentrate and ask again'
+#   'Very doubtful'
+#   'As I see it, yes'
+#   'Most likely'
+#   'Outlook good'
+#   'Yes'
+#   'Signs point to yes'
+# )
+
+#Loading from file answers.txt. Can use mapfile or readarray. They are synonyms for each other
+#Get the full path to the current working directory no matter where on the system.
+declare dir="${0%%/*}"
+readarray -t answers < "${dir:-.}/answers.txt"
+
+# printf "%s\n" "${answers[*]}"
+# ${answers[*]} will combine all elements as one
+# ${answers[#]} will treat each element as separate arguement
+# ${answers[RANDOM%3]} random first three elements. You do not need the
+# (()) surrounding the RANDOM
+# ${#answers} number of elements in array
+
+welcome ()
+{
+
+  cat <<-EOM
+	Welcome to the magic eight ball.
+	Enter a yes or no question and your  answer will be granted.
+	EOM
+
+}
+
+8ball ()
+{
+  #TODO have the program accept an arguement as a question and return response. Otherwise start with the while loop to read questions.
+  #TODO Add an exit for the program.
+  welcome
+  local answer
+  #IFS is used for word splitting.
+  #Makes sure that IFS is what you expect during the while loop.
+  #When reading individual lines, you might want to put a -r as well to prevent read from escaping special characters. Important if you want to get the line exactly as it was.
+
+	while IFS= read -p "> " line; do
+    # My way
+#    local random=$((RANDOM % 3))
+#    if [[ $random = 0 ]]; then
+#      answer="yes"
+#    elif [[ $random = 1 ]]; then
+#      answer="no"
+#    else
+#      answer="maybe"
+#    fi
+    # Another example using short circuit logic
+    # local i
+    # i=$((RANDOM % 3))
+    # ((i==0)) && echo "Yes." && continue
+    # ((i==1)) && echo "No." && continue
+    # ((i==2)) && echo "Maybe." && continue
+ 
+#     case "$answer" in
+#     0) answer="Yes" ;;
+#     1) answer="No" ;;
+#     2) answer="Maybe" ;;
+#     *) answer="Error" ;;
+#     esac
+
+		printf "This is my answer: %s\n" "${answers[RANDOM%${#answers}]}"
+	done
+}
+
+8ball
+
+
+
+
+
+
