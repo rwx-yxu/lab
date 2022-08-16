@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+
+declare -A person
+# same declaration:
+# declare -A person([name]=rob)
+person[name]=rob
+person[age]=22
+printf "Name: %-20s\nAge:  %-20d\n" "${person[name]^}" "${person[age]}"

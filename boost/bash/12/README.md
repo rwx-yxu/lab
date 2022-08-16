@@ -25,4 +25,18 @@
 * `watch ./8ball` will just run the program repeatedly instead of using
   a while loop. The default is 2 seconds. The -n argument will change
   the seconds
+* Alternative terms for associative arrays:
+  * dictionaries
+  * maps
+  * hash maps
+  * hash tables
+  * hashes
+  * key/value pair
+* Why would looking up a key/value pair not be safe for concurrency (in
+  go)?
+  * The algorithm that is used doesn't promise to keep track how often
+    you are going to read that value. In other words `memoization`.
+* Associative arrays in bash are not compound.
+  * You cannot have an element be another array in bash. Other languages
+    will allow for this.
 
