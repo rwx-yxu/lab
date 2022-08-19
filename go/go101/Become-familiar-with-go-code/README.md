@@ -660,12 +660,122 @@ var b = byte(1) << m / 128
 
 ```
 
+## Function Declarations
+```
+func SquaresOfSumAndDiff(a int64, b int64) (s int64, d int64) {
+ x, y := a + b, a - b
+ s = x * x
+ d = y * y
+ return // <=> return s, d
+}
+```
+* Parameters and results are treated as local variables.
+* The names in the result declaration list of a function can be present
+  or absent all together. If a result is defined with a name,
+  then the result is called a named result; otherwise it is called an
+  anonymous result.
+* When the results in a function declaration are anonymous; the return
+  keyword must be followed by a sequence of return values.
+```
+func SquaresOfSumAndDiff(a int64, b int64) (int64, int64) {
+ return (a+b) * (a+b), (a-b) * (a-b)
+}
+```
+* If all the parameters are never used within the function body, the
+  names in the parameter declaration list can be omitted.
+* Local variables within a function body must be used.
+* Go doesn't support default parameter values. The initial value of each
+  result is the zero value of its type.
+```
+func f() (x int, y bool) {
+ println(x, y) // 0 false
+ return
+}
 
+func SquaresOfSumAndDiff(a, b int64) (s, d int64) {
+ return (a+b) * (a+b), (a-b) * (a-b)
+ // The above line is equivalent
+ // to the following line.
+ /*
+ s = (a+b) * (a+b); d = (a-b) * (a-b); return
+ */
+}
+```
+* Functions must be directly declared at the package level.
+* A function can't be declared within the body with another
+  function.
+* The type of an argument is not required to be identical with the
+  corresponding parameter type. The only requirement for the
+  argument is it must be assignable to the corresponding parameter
+  type.
+```
+package main
 
+func SquaresOfSumAndDiff(a int64, b int64) (int64, int64) {
+ return (a+b) * (a+b), (a-b) * (a-b)
+}
 
+func CompareLower4bits(m, n uint32) (r bool) {
+ r = m&0xF > n&0xF
+ return
+}
 
+// Initialize a package-level variable
+// with a function call.
+var v = VersionString()
 
+func main() {
+ println(v) // v1.0
+ x, y := SquaresOfSumAndDiff(3, 6)
+ println(x, y) // 81 9
+ b := CompareLower4bits(uint32(x), uint32(y))
+ println(b) // false
+ // "Go" is deduced as a string, 
+ // and 1 is deduced as an int32.
+ doNothing("Go", 1)
+}
 
+func VersionString() string {}
+```
+
+* Function calls can be deferred or invoked in new goroutines
+  (green threads) in Go.
+
+## Anonymous Functions
+* Anonymous functions have no function name portion of the function
+  declaration
+```
+package main
+
+func main() {
+	// This anonymous function has no parameters
+	// but has two results.
+	x, y := func() (int, int) {
+		println("This function has no parameters.")
+		return 3, 4
+	}() // Call it. No arguments are needed.
+
+	// The following anonymous function have no results.
+
+	func(a, b int) {
+		// The following line prints: a*a + b*b = 25
+		println("a*a + b*b =", a*a+b*b)
+	}(x, y) // pass argument x and y to parameter a and b.
+
+	func(x int) {
+		// The parameter x shadows the outer x.
+		// The following line prints: x*x + y*y = 32
+		println("x*x + y*y =", x*x+y*y)
+	}(y) // pass argument y to parameter x.
+
+	func() {
+    // This function is in the scope of x and y variables declared
+    above so it can use the twp variables directly.
+		// The following line prints: x*x + y*y = 25
+		println("x*x + y*y =", x*x+y*y)
+	}() // no arguments are needed.
+}
+```
 
 
 
