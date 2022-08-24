@@ -777,16 +777,82 @@ func main() {
 }
 ```
 
+## Code Packages and Package Imports
+* Only exported code elements in a package can be used in the source
+  file which imports the package.
+* The built in functions `print` and `println` are not recommended to be
+  used in the production environment as they are not guaranteed to stay
+  in the future Go versions.
+* A package import is also called an import declaration formally in Go.
+  * An import declaration is only visible to the source file which
+    contains the import declaration. It is not visible to other source
+    files in the same package.
+```
+package main
 
+import "fmt"
+import "math/rand"
+//math/rand is a subpackage of math
+func main() {
+ fmt.Printf("Next pseudo-random number is always %v.\n",
+rand.Uint32())
+//Output:
+//Next pseudo-random number is always 2596996162.
+}
 
-
-
-
-
-
-
-
-
+```
+* `fmt.Printf` verbs:
+  * %v, which will be replaced with the general string representation of
+    the corresponding argument.
+  * %T, which will be replaced with the type name or type literal of the
+    corresponding argument.
+  * %x, should be strings, integers, integer arrays or integer slices.
+  * %s, should be string or byte slice.
+  * Format verb %% represents a percent sign.
+* Go does not support circular package dependencies.
+  * For example, if package a depends on package b and package b depends
+    on package c, then the source files in package c can't import
+    package a and b. This also means that package b can't import package
+    a.
+* There can be multiple functions named as `init` declared in a package
+  or source file.
+  * `Init` functions must not have any input parameters and return
+    values.
+  * The `init` keyword can only be used in function declarations.
+  * At run time, the `init` function will be invoked once sequentially before
+    the main function.
+* At run time, a package will be loaded after all its dependency
+  packages. Each package will be loaded once and only once.
+* An `init` function in an importing package will be invoked after all the
+  `init` functions declared in the dependency packages of the importing
+  package.
+* It is not a good idea to have dependency relations between two `init`
+  functions in two different source files.
+* The default value of the package name is the package name. Adding a
+  import name is optional.
+```
+//All the same package name.
+import fmt "fmt" // <=> import "fmt"
+import rand "math/rand" // <=> import "math/rand"
+import time "time" // <=> import "time"
+```
+* We must use the fill import declaration if a source file import two
+  packages with the same name to avoid confusing the compiler. At least
+  one of the package imports must have a package name.
+* We can also use `.` for the import name. The prefix part of the
+  package must be omitted when referencing package functions. Dot
+  functions are not recommended because they reduce readability.
+* A `_` (blank identifier) can also be used for package imports called
+  anonymous imports or blank imports.
+  * The importing source file can't use the exported code elements in
+    blank imported packages.
+  * The purpose of blank imports is to initialize the imported packages.
+  * Each of the `init` functions in the blank packages will be called
+    once.
+  * Each non-blank imports must be used at least once.
+* Modules are a collection of several packages.
+  * These packages are all contained in the same folder which is called
+    the root folder.
 
 
 
