@@ -1,12 +1,17 @@
-package main
+package greet_test
 
+import "github.com/rwx-yxu/lab/boost/go/18/greet"
+
+/*
 func ExampleGreet() {
 
-	greet()
-	greet("Yongle")
-	greet("Yongle", "Xu")
+	greet.Hi()
 	//Output:
 	//Hi, there!
-	//Hi, Yongle!
-	//Hi, Yongle Xu!
+}
+*/
+func ExampleGreet_With_Arguments() {
+	greet.Hi("Yongle")
+	//Output:
+	//Hi, Yongle, nice to meet you!
 }
