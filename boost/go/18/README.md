@@ -1,5 +1,5 @@
 # Boost week 18 notes
-* Use `go install cmd/greet/; greet` in go mod directory to install the binary to local
+* Use `go install ./cmd/greet/; greet` in go mod directory to install the binary to local
   machine from the go env variable.
 * The cmd directory is for indevidual commands
 * Stuff that has to do with interacting with the user on the command
