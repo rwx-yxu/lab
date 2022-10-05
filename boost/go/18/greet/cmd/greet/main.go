@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/rwx-yxu/lab/boost/go/18/greet"
-	"github.com/rwx-yxu/lab/boost/go/18/greet/internal"
+	"github.com/rwx-yxu/lab/boost/go/20/cli"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 
 	if name == "" {
 		fmt.Println("Hello, there, what's your name?")
-		name, err = internal.ReadLine(os.Stdin)
+		name, err = cli.ReadLine(os.Stdin)
 		if err != nil {
 			log.Println(err)
 			return
