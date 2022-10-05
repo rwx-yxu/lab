@@ -3,7 +3,10 @@ package eightball
 import (
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
+
+	"github.com/rwx-yxu/lab/boost/go/20/cli"
 )
 
 const art = `
@@ -31,19 +34,6 @@ var Responses = [...]string{
 	"Never",
 }
 
-//Prints that optional prompt (> by default) and returns the string
-//entered by the user
-func Prompt(args ...string) string {
-	var val string
-	p := "> "
-	if len(args) > 0 {
-		p = args[0]
-	}
-	fmt.Print(p)
-	val = greet.ReadLine()
-	return val
-}
-
 //Respond will return a random response from a list of Responses.
 func Respond() string {
 	rand.Seed(time.Now().UnixNano())
@@ -51,4 +41,16 @@ func Respond() string {
 
 	//Pick response
 	return Responses[i]
+}
+
+//Run starts an interactive eight ball session prompting the user for
+//input and answering until interrupted.
+func Run() {
+	fmt.Println(art)
+	fmt.Println("Welcome to the magic eight ball!")
+	fmt.Println("Enter your yes or no question")
+	for {
+		cli.Prompt(os.Stdin, "-->")
+		fmt.Println(Respond())
+	}
 }

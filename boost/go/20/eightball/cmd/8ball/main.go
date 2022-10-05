@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/rwx-yxu/lab/boost/go/20/eightball"
 
 func main() {
-	fmt.Println("Welcome to the magic 8ball.")
+	eightball.Run()
 }

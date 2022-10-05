@@ -65,4 +65,11 @@ func output() string {
 * Usually, you do not want to commit the go.work to source control
   though. Will cause issues if some else tries to build but they do not
   have the dependency in a specific place defined in the go.work file.
-
+* Go will install modules from the main branch when looking on github.
+  If working on a separate branch, using go get will cause issues if
+  the module is not in main branch.
+* Use `go get <path-to-repo>@<branch>` for a specific branch.
+* Be careful with go work to push out dependency changes as well if
+  necessary. Otherwise everything will look like it is fine but when
+  someone else imports the package they will get errors if the changes
+  weren't made to the dependency package as well.
