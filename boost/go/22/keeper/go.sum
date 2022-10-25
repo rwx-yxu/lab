@@ -1,0 +1,6 @@
+github.com/rwx-yxu/term v0.0.0-20221011105441-0d27bb0f5bca h1:P/riGh+Q9hgSijFT0oDwZidk/Dh5PZtGfslEiV4ruGY=
+github.com/rwx-yxu/term v0.0.0-20221011105441-0d27bb0f5bca/go.mod h1:1ArRdgpfpqdit4gqc7oRMpovvHf4bvUVkWoazyLVICg=
+golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 h1:SrN+KX8Art/Sf4HNj6Zcz06G7VEz+7w9tdXTPOZ7+l4=
+golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/term v0.1.0 h1:g6Z6vPFA9dYBAF7DWcH6sCcOntplXsDKcliusYijMlw=
+golang.org/x/term v0.1.0/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
