@@ -9,7 +9,7 @@ import (
 
 func main() {
 	for {
-		fmt.Print(termcolors.Rand() + "nyan" + termcolors.Reset)
+		fmt.Println(termcolors.Rand() + "nyan" + termcolors.Reset)
 		time.Sleep(100 * time.Millisecond)
 	}
 }
