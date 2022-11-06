@@ -12,5 +12,5 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Usage:%s host:port", os.Args[0])
 		os.Exit(1)
 	}
-	client.Run(os.Args)
+	client.Run(os.Args, os.Stdin)
 }
