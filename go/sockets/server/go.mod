@@ -1,4 +1,4 @@
-module github.com/rwx-yxu/lab/go/sockets/tcpserver
+module github.com/rwx-yxu/lab/go/sockets/server
 
 go 1.18
 
