@@ -854,8 +854,357 @@ import time "time" // <=> import "time"
   * These packages are all contained in the same folder which is called
     the root folder.
 
+## Expressions, statements and Simple Statements
+* There are six kinds of simple statements:
+  * Short variable declaration forms
+  * Pure value assignments including x op= y
+  * Function/method calls and channel receive operations. These
+    statements can also be used as expressions.
+  * Channel send operations.
+  * Blank statements.
+  * x++ and x--
+* Go does not support ++x and --x.
+```
+// Some non-simple statements.
+import "time"
+var a = 123
+const B = "Go"
+type Choice bool
+func f() int {
+ for a < 10 {
+  break
+ }
 
+ // This is an explicit code block.
+ {
+  // ...
+ }
+ return 567
+}
 
+// Some simple statements:
+c := make(chan bool) // channels will be explained later
+a = 789
+a += 5
+a = f() // here f() is used as an expression
+a++
+a--
+c <- true // a channel send operation
+z := <-c // a channel receive operation used as the
+// source value in an assignment statement.
 
+// Some expressions:
+123
+true
+B
+B + " language"
+a - 789
+a > 0 // an untyped boolean value
+f // a function value of type "func ()"
+
+// The following ones can be used as both
+// simple statements and expressions.
+f()
+<-c // a channel receive operation
+```
+
+## Introduction to control flows in Go
+* There are three basic control flow code blocks in Go:
+  * if-else two-way conditional execution block
+  * for loop block
+  * switch-case multi way conditional execution block
+* There are also control flows which are related to certain types in
+  Go.
+  * for-range for container types
+  * type-switch multi-way conditional execution block for
+    interface types.
+  * select-case block for channel types.
+* Go also supports break, continue, goto and fallthrough jump statements.
+* We can use break statements to make executions jump out of
+  control flow for all flow blocks beside if-else.
+
+```
+if InitSimpleStatement; Condition {
+  //do something
+} else {
+  //do something
+}
+```
+
+* The InitSimpleStatement portion is optional. A condition must
+  be an expression that results in a boolean value.
+  * The condition can be enclosed in a pair of brackets but it cannot
+    include the InitSimpleStatement.
+  * The InitSimpleStatement is often a short form variable
+    declaration.
+* The InitSimpleStatement is executed before executing other
+  statements in the if-else block.
+
+```
+for InitSimpleStatement; Condition; PostSimpleStatement {
+ // do something
+}
+```
+
+* The for keyword cannot be enclosed with a pair of brackets.
+* The three portions following for are optional.
+* The InitsimpleStatement will be executed before only once before
+  executing the other statement in the for loop.
+* Although Go does not have a while loop, the InitSimpleStatement
+  and PostSimpleStatement to just include the condition.
+* If the condition portion is absent, the compiler will evaluate as
+  true.
+
+```
+for i := 0; ; i++ { // <=> for i := 0; true; i++ {
+  if i >= 10 {
+    // "break" statement will be explained below.
+    break
+  }
+  fmt.Println(i)
+}
+
+// The following 4 endless loops are
+// equivalent to each other.
+for ; true; {
+}
+for true {
+}
+for ; ; {
+}
+for {
+}
+```
+
+* A break statement can be used to make an execution jump out of the for
+  loop in advance.
+    * If there is a nested loop, it will break to the outer loop and
+      carry on execution.
+* A `continue` can be used to end the current loop in advance and go to
+  the next post statement.
+* A switch-case statement should be preferred over if else if statements
+  in go.
+
+```
+switch InitSimpleStatement; CompareOperand0 {
+ case CompareOperandList1:
+  // do something
+ case CompareOperandList2:
+  // do something
+  ...
+ case CompareOperandListN:
+  // do something
+ default:
+  // do something
+}
+```
+
+* Each case statement is evaluated using a `==` operation
+* An overlap in options may cause the compiler to not compile.
+* At the end of a branch block. the execution will automatically break
+  out of the case-switch
+* Go also provides a `fallthrough` keyword that allows for execution to
+  enter into the next branch.
+  * `fallthrough` must be the final statement in the branch.
+  * `fallthrough` must cannot be used in the final branch of a
+    switch-case statement.
+* The default branch can also be positioned anywhere in a switch-case
+  statement.
+* A switch can be invoked without the initial compare operand.
+
+### Goto
+* Go supports goto and labels to jump executions to another block
+  denoted by a label.
+  * Labels and goto must be declared in the same function otherwise, the
+    compiler will not compile.
+  * Variables cannot be declared inside of a label. They must be
+    declared outside of label scope.
+  * Goto is great for control flow. Instead of using boolean variable
+    checks at different points of execution. A goto can be used to
+    directly go to a block of code. An example of this is using an exit
+    label or errors.
+
+##Goroutines
+* Goroutines are often called green threads that are maintained and
+  scheduled by the runtime.
+* The cost of a goroutines is much lighter than an OS thread.
+* Go does not support creation of system thread in code.
+* Each program starts with one goroutine called main goroutine.
+* A goroutine can create new goroutines using the `go` keyword.
+* All goroutines will exit if the main goroutine exits regardless of
+  state.
+
+### Concurrency Synchronization
+* Go can use the `WaitGroup` type in the sync package to sync executions
+  between goroutines and the main goroutine.
+* The waitgroup has three methods:
+  * Add: used to register the number of new tasks.
+  * Done: used to notify that a task is finished.
+  * wait: make the caller goroutine become blocking until all registered
+    tasks are finished.
+```
+package main
+
+import (
+ "log"
+ "math/rand"
+ "time"
+ "sync"
+)
+
+var wg sync.WaitGroup
+func SayGreetings(greeting string, times int) {
+ for i := 0; i < times; i++ {
+  log.Println(greeting)
+  d := time.Second * time.Duration(rand.Intn(5)) / 2
+  time.Sleep(d)
+ }
+ // Notify a task is finished.
+ wg.Done() // <=> wg.Add(-1)
+}
+
+func main() {
+ rand.Seed(time.Now().UnixNano())
+ log.SetFlags(0)
+ wg.Add(2) // register two tasks.
+ go SayGreetings("hi!", 10)
+ go SayGreetings("hello!", 10)
+ wg.Wait() // block until all tasks are finished.
+}
+```
+
+### Goroutine States
+The main goroutine will enter a blocking state when `wg.Wait()` is
+called and enter back into running state when the other goroutines
+finish their tasks.
+
+* A goroutine is still considered to be running if it is asleep or
+  waiting the response of a system call or network connection such as
+  waiting for an input read or TCPDial connection.
+* Goroutines can only exit from running state. Never when a goroutine is
+  blocked.
+* A blocking goroutine can only be unblocked by an operation made in
+  another goroutine. 
+  * A deadlock can occur if all goroutines in a go program are in a
+    blocking state. The runtime will catch this.
+
+### Goroutine Schedule
+Not all goroutines in running state are being executed at a given time.
+The maximum number of goroutines being executed will not exceed the
+number of logical CPUs available for a program. (logical cores are the
+total number of threads available).
+
+* We can call the `runtime.NumCPU` to get the number of logical CPUs
+  available for the current program. The go runtime must frequently
+  switch execution between goroutines to let each goroutine a chance to
+  execute.
+* Calling `runtime.GOMAXPROCS` will get and set the number of logical
+  processors. Default value since Go 1.5 is equal to the nuymber of
+  logical CPUs available for the current running program. Some file IO
+  heavy programs, a `GOMAXPROCS` value larger than `runtime.NumCPU()`
+  will be helpful.
+* `GOMAXPROCS` can also be set through environment variable.
+* At any given time, the number of goroutines in the executing state, is
+  no more than the smaller one of `runtime.NumCPU` and `runtime.GOMAXPROCS`
+
+###Deferred Function calls
+When a defer statement is executed, the deferred function call is not
+executed immediately. The deferred call is pushed on a queue maintained
+by its caller goroutine. Once the goroutine enters its exiting phase,
+all the deffered function called pushed into the deferred call queue
+will be executed as first in, last out order.
+
+```
+package main
+
+import "fmt"
+
+func main() {
+	defer fmt.Println("The third line.")
+	defer fmt.Println("The second line.")
+	fmt.Println("The first line.")
+}
+//Output
+The first line.
+The second line.
+The third line.
+```
+
+* Deferred functions can be nested. If a deferred function is nested,
+  the inner deferred functions will execute in the order of the queue.
+  Then, the parent deferred function will carry on execution.
+* Deferred function calls can modify the name return values.
+
+```
+package main
+
+import "fmt"
+
+func Triple(n int) (r int) {
+	defer func() {
+    //Called after return 10+5
+		r += n // modify the return value
+	}()
+  
+  //Called first 5+5
+	return n + n // <=> r = n + n; return
+}
+
+func main() {
+	fmt.Println(Triple(5)) // 15
+}
+```
+
+The Evaluation of deferred function arguments are evaluated at the
+moment when the corresponding defer statement is executed (when the
+deferred call is pushed into the deferred queue) The results are used
+when the deferred call is being executed later.
+
+###Panic and Recover
+Go doesn't support exception throwing or catching preferring to explicit
+handle errors.
+
+* Calling the inbuilt `panic` function enters the goroutine into
+  panicking status.
+* Once a panic occurs in a function, the function call returns
+  immediately and enters its exiting phase.
+* Calling recover function in a deferred call, can remove an active
+  panic of the current goroutine to enter the normal calm status again.
+* If panicking gorotuine exits without being recovered will make the
+  whole program crash.
+
+```
+The built-in panic and recover functions are declared as
+func panic(v interface{})
+func recover() interface{}
+```
+
+* The returned value of a recover call is the value that was passed into
+  the panic function.
+
+```
+package main
+
+import "fmt"
+
+func main() {
+	defer func() {
+		fmt.Println("exit normally.")
+	}()
+	fmt.Println("hi!")
+	defer func() {
+		v := recover()
+		fmt.Println("recovered:", v)
+	}()
+	panic("bye!")
+	fmt.Println("unreachable")
+}
+//Output
+hi!
+recovered: bye!
+exit normally.
+```
+
+* Generally, panics are used for logic errors.
 
 
