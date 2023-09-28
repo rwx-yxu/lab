@@ -2,16 +2,43 @@ package example
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 	"sync"
+
+	"github.com/rwxrob/choose"
 )
 
-func Run() int {
-
-	return 1
+var Choices = []string{
+	`Go routine size - Print out the size of an individual empty go routine`,
+	`Closure - Invoke a go routine in a for loop which iterates over a
+string slice to print out the current item.`,
+	`Wait group - Use wait groups to demonstrate the go routines are invoked
+according to the runtime scheduler.`,
+	`Mutex - Use sync.Mutex to modify a variable concurrently by using locks 
+to ensure resource protection when multiple processes want access to modify.`,
 }
 
-func GoroutineSize() {
+func Run() int {
+	choice, _, err := choose.From(Choices)
+	if err != nil {
+		log.Println(err)
+		return 1
+	}
+	switch choice {
+	case 0:
+		GoRoutineSize()
+	case 1:
+		Closure()
+	case 2:
+		WG()
+	case 3:
+		Access()
+	}
+	return 0
+}
+
+func GoRoutineSize() {
 	memConsumed := func() uint64 {
 		runtime.GC()
 		var s runtime.MemStats
@@ -31,23 +58,11 @@ func GoroutineSize() {
 	}
 	wg.Wait()
 	after := memConsumed()
-	fmt.Printf("%.3fkb", float64(after-before)/numGoroutines/1000)
+	fmt.Printf("%.3fkb\n", float64(after-before)/numGoroutines/1000)
 
 }
 
-func ClosureBroken() {
-	var wg sync.WaitGroup
-	for _, salutation := range []string{"hello", "greetings", "good day"} {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			fmt.Println(salutation)
-		}()
-	}
-	wg.Wait()
-}
-
-func ClosureFixed() {
+func Closure() {
 	var wg sync.WaitGroup
 	for _, salutation := range []string{"hello", "greetings", "good day"} {
 		wg.Add(1)
